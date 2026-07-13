@@ -1,2 +1,24 @@
+# Dependencies
 node_modules/
-settings.json
+client/node_modules/
+server/node_modules/
+
+# Environment files
+.env
+client/.env
+server/.env
+
+# Build output
+client/dist/
+
+# Logs
+*.log
+npm-debug.log*
+server/logs/
+
+# Uploaded files (generated at runtime)
+server/uploads/
+
+# OS
+.DS_Store
+Thumbs.db
