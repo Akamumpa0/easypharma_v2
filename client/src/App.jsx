@@ -35,6 +35,8 @@ import PurchaseOrdersPage from './pages/pharmacist/PurchaseOrdersPage.jsx';
 import ReturnsPage from './pages/pharmacist/ReturnsPage.jsx';
 import StockMovementsPage from './pages/pharmacist/StockMovementsPage.jsx';
 import ReconciliationPage from './pages/pharmacist/ReconciliationPage.jsx';
+import StockValuationPage from './pages/pharmacist/StockValuationPage.jsx';
+import ProfitAnalyticsPage from './pages/pharmacist/ProfitAnalyticsPage.jsx';
 
 // Shared pages
 import ActivityLogsPage from './pages/shared/ActivityLogsPage.jsx';
@@ -101,6 +103,8 @@ export default function App() {
               <Route path="update-stocks"       element={<UpdateStocksPage />} />
               <Route path="stock-movements"     element={<StockMovementsPage />} />
               <Route path="reconciliation"      element={<ReconciliationPage />} />
+              <Route path="stock-valuation"     element={<StockValuationPage />} />
+              <Route path="profit-analytics"    element={<ProfitAnalyticsPage />} />
               <Route path="view-reports"        element={<ViewReportsPage />} />
               <Route path="financial-dashboard" element={<FinancialDashboardPage />} />
               <Route path="reorder"             element={<ReorderPage />} />

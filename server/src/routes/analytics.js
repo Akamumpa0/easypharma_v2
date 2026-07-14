@@ -186,6 +186,75 @@ router.get('/medicines', requireAuth, async (req, res, next) => {
   }
 });
 
+// GET /api/analytics/sales?period=month — profit per individual sale
+router.get('/sales', requireAuth, async (req, res, next) => {
+  try {
+    const { period = 'month', from: fromQ, to: toQ, limit = 50, page = 1 } = req.query;
+    const { from, to } = fromQ && toQ
+      ? { from: new Date(fromQ), to: new Date(toQ) }
+      : dateRange(period);
+
+    const bills = await db
+      .select({
+        id: customerBills.id,
+        customerName: customerBills.customerName,
+        totalAmount: customerBills.totalAmount,
+        createdAt: customerBills.createdAt,
+      })
+      .from(customerBills)
+      .where(and(
+        eq(customerBills.userId, req.user.id),
+        gte(customerBills.createdAt, from),
+        lte(customerBills.createdAt, to),
+      ))
+      .orderBy(desc(customerBills.createdAt))
+      .limit(parseInt(limit))
+      .offset((parseInt(page) - 1) * parseInt(limit));
+
+    // For each bill, calculate profit by comparing selling vs buying price
+    const enriched = await Promise.all(bills.map(async (bill) => {
+      const items = await db
+        .select({
+          medicineId: customerBillRecords.medicineId,
+          quantity: customerBillRecords.quantity,
+          unitPrice: customerBillRecords.unitPrice,
+          subtotal: customerBillRecords.subtotal,
+        })
+        .from(customerBillRecords)
+        .where(eq(customerBillRecords.billId, bill.id));
+
+      let totalCOGS = 0;
+      for (const item of items) {
+        const [stock] = await db
+          .select({ buyingPrice: stockMedicines.buyingPrice })
+          .from(stockMedicines)
+          .where(and(
+            eq(stockMedicines.medicineId, item.medicineId),
+            eq(stockMedicines.userId, req.user.id),
+          ));
+        totalCOGS += Number(item.quantity) * Number(stock?.buyingPrice || 0);
+      }
+
+      const revenue = Number(bill.totalAmount);
+      const profit = revenue - totalCOGS;
+      const margin = revenue > 0 ? round((profit / revenue) * 100) : 0;
+
+      return {
+        billId: bill.id,
+        customerName: bill.customerName || 'Walk-in',
+        revenue: round(revenue),
+        cogs: round(totalCOGS),
+        profit: round(profit),
+        margin,
+        itemCount: items.length,
+        date: bill.createdAt,
+      };
+    }));
+
+    res.json({ period, sales: enriched });
+  } catch (err) { next(err); }
+});
+
 // GET /api/analytics/summary — quick KPI summary
 router.get('/summary', requireAuth, async (req, res, next) => {
   try {
