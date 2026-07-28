@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../db/index.js';
 import { users } from '../db/schema.js';
+import { requireAuth, requireRole } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -31,6 +32,8 @@ router.post('/login', async (req, res, next) => {
     const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) return res.status(401).json({ error: 'Invalid email or password' });
 
+    await db.update(users).set({ lastLogin: new Date() }).where(eq(users.id, user.id));
+
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role, firstName: user.firstName, lastName: user.lastName },
       process.env.JWT_SECRET,
@@ -54,8 +57,8 @@ router.post('/login', async (req, res, next) => {
   }
 });
 
-// POST /api/auth/reset-password  (no email service — admin resets directly)
-router.post('/reset-password', async (req, res, next) => {
+// POST /api/auth/reset-password (admin resets directly)
+router.post('/reset-password', requireAuth, requireRole('admin'), async (req, res, next) => {
   try {
     const { email, newPassword } = resetSchema.parse(req.body);
 

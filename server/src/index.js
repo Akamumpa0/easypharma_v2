@@ -38,12 +38,33 @@ import systemRoutes from './routes/system.js';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ── Security ──────────────────────────────────────────────────────────────────
+// ── Security & CORS ───────────────────────────────────────────────────────────
 app.use(helmet({ contentSecurityPolicy: false })); // disabled so Swagger UI loads
-app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true); // allow server-to-server or mobile requests
+
+    const cleanOrigin = origin.trim().replace(/\/$/, '');
+    const configuredUrl = process.env.CLIENT_URL ? process.env.CLIENT_URL.trim().replace(/\/$/, '') : null;
+
+    const isLocal = cleanOrigin.startsWith('http://localhost') || cleanOrigin.startsWith('http://127.0.0.1');
+    const isRenderOrVercel = cleanOrigin.endsWith('.onrender.com') || cleanOrigin.endsWith('.vercel.app');
+    const isConfigured = configuredUrl && cleanOrigin === configuredUrl;
+
+    if (isLocal || isRenderOrVercel || isConfigured) {
+      callback(null, true);
+    } else {
+      callback(null, false);
+    }
+  },
   credentials: true,
-}));
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Explicitly resolve preflight OPTIONS requests without falling through to 404 handler
 
 // ── Request logging (morgan → winston) ───────────────────────────────────────
 app.use(morgan('combined', {

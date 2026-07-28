@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Pill, CheckCircle } from 'lucide-react';
+import { Pill, CheckCircle, ShieldAlert } from 'lucide-react';
 import api from '../../lib/api.js';
 import { getErrorMessage } from '../../lib/utils.js';
 
@@ -56,6 +56,14 @@ export default function ResetPasswordPage() {
             <>
               <h2 className="text-xl font-semibold text-gray-800 mb-2">Reset Password</h2>
               <p className="text-sm text-gray-500 mb-6">Enter your email and choose a new password.</p>
+
+              <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-4 mb-6 flex items-start gap-3 shadow-sm">
+                <ShieldAlert className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div className="text-xs leading-relaxed">
+                  <span className="font-semibold block text-sm mb-0.5 text-amber-900">Security Policy Notice</span>
+                  For compliance and system security, automated self-service password recovery is restricted. If you have lost access, please ask your <strong>System Administrator</strong> to update your credentials via the Admin Management Console.
+                </div>
+              </div>
 
               {serverError && (
                 <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-md px-4 py-3 mb-4">

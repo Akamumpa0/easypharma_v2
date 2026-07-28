@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../db/index.js';
-import { customerBills, customerBillRecords, stockMedicines, dailyReports } from '../db/schema.js';
+import { customerBills, customerBillRecords, stockMedicines, dailyReports, stockMovements } from '../db/schema.js';
 import { requireAuth, requireRole } from '../middleware/auth.js';
 
 const router = Router();
@@ -60,6 +60,7 @@ router.post('/', requireAuth, requireRole('pharmacist'), async (req, res, next) 
       totalAmount: total.toFixed(2),
     }).returning();
 
+    let totalCost = 0;
     // Insert line items and deduct stock
     for (const item of data.items) {
       const subtotal = (parseFloat(item.unitPrice) * item.quantity).toFixed(2);
@@ -73,7 +74,7 @@ router.post('/', requireAuth, requireRole('pharmacist'), async (req, res, next) 
         subtotal,
       });
 
-      // Deduct from stock
+      // Deduct from stock & compute COGS
       const [stockItem] = await db.select().from(stockMedicines)
         .where(and(
           eq(stockMedicines.medicineId, item.medicineId),
@@ -85,10 +86,22 @@ router.post('/', requireAuth, requireRole('pharmacist'), async (req, res, next) 
         await db.update(stockMedicines)
           .set({ quantity: newQty, updatedAt: new Date() })
           .where(eq(stockMedicines.id, stockItem.id));
+
+        totalCost += (parseFloat(stockItem.buyingPrice || '0') * item.quantity);
       }
+
+      // Record stock movement for audit & daily reconciliation
+      await db.insert(stockMovements).values({
+        userId: req.user.id,
+        medicineId: item.medicineId,
+        movementType: 'sold',
+        quantity: -item.quantity,
+        referenceId: bill.id,
+        notes: `Sold via POS checkout (Bill #${bill.id.slice(0, 8)})`,
+      });
     }
 
-    // Update daily report
+    // Update daily report with COGS and profit
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -96,17 +109,24 @@ router.post('/', requireAuth, requireRole('pharmacist'), async (req, res, next) 
       .where(and(eq(dailyReports.userId, req.user.id), eq(dailyReports.date, today)));
 
     if (existingReport) {
+      const newSales = parseFloat(existingReport.totalSales) + total;
+      const newCost = parseFloat(existingReport.totalCost || '0') + totalCost;
+      const newProfit = newSales - newCost;
+
       await db.update(dailyReports).set({
-        totalSales: (parseFloat(existingReport.totalSales) + total).toFixed(2),
+        totalSales: newSales.toFixed(2),
+        totalCost: newCost.toFixed(2),
+        totalProfit: newProfit.toFixed(2),
         billCount: existingReport.billCount + 1,
       }).where(eq(dailyReports.id, existingReport.id));
     } else {
+      const profit = total - totalCost;
       await db.insert(dailyReports).values({
         userId: req.user.id,
         date: today,
         totalSales: total.toFixed(2),
-        totalCost: '0',
-        totalProfit: total.toFixed(2),
+        totalCost: totalCost.toFixed(2),
+        totalProfit: profit.toFixed(2),
         billCount: 1,
       });
     }

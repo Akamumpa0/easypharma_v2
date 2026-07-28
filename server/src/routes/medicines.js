@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { eq, or, ilike } from 'drizzle-orm';
+import { eq, or, ilike, and } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../db/index.js';
 import { medicines } from '../db/schema.js';
@@ -57,7 +57,8 @@ router.get('/', requireAuth, async (req, res, next) => {
       conditions.push(eq(medicines.requiresPrescription, true));
     }
 
-    const result = await db.select().from(medicines);
+    const result = await db.select().from(medicines)
+      .where(conditions.length ? and(...conditions) : undefined);
     res.json(result);
   } catch (err) { next(err); }
 });

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { eq, or, ilike } from 'drizzle-orm';
+import { eq, or, ilike, and } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../db/index.js';
 import { apiUsers, medicines, stockMedicines, users } from '../db/schema.js';
@@ -136,10 +136,10 @@ router.get('/:key/quantity/:medicineId/:userId', async (req, res, next) => {
 
     const [stock] = await db.select({ quantity: stockMedicines.quantity })
       .from(stockMedicines)
-      .where(
-        eq(stockMedicines.medicineId, req.params.medicineId) &&
+      .where(and(
+        eq(stockMedicines.medicineId, req.params.medicineId),
         eq(stockMedicines.userId, req.params.userId)
-      );
+      ));
 
     if (!stock) return res.status(404).json({ status: 'Not Found', message: 'Stock record not found' });
     res.json({ quantity: stock.quantity });
@@ -154,10 +154,10 @@ router.get('/:key/selling-price/:medicineId/:userId', async (req, res, next) => 
 
     const [stock] = await db.select({ sellingPrice: stockMedicines.sellingPrice })
       .from(stockMedicines)
-      .where(
-        eq(stockMedicines.medicineId, req.params.medicineId) &&
+      .where(and(
+        eq(stockMedicines.medicineId, req.params.medicineId),
         eq(stockMedicines.userId, req.params.userId)
-      );
+      ));
 
     if (!stock) return res.status(404).json({ status: 'Not Found', message: 'Stock record not found' });
     res.json({ sellingPrice: stock.sellingPrice });

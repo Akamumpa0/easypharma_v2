@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../db/index.js';
-import { stockMedicines, medicines, stockBillRecords } from '../db/schema.js';
+import { stockMedicines, medicines, stockBillRecords, stockMovements } from '../db/schema.js';
 import { requireAuth, requireRole } from '../middleware/auth.js';
 
 const router = Router();
@@ -92,6 +92,15 @@ router.post('/', requireAuth, requireRole('pharmacist'), async (req, res, next) 
       quantity: data.quantity,
       buyingPrice: data.buyingPrice || '0',
       totalCost: (parseFloat(data.buyingPrice || '0') * data.quantity).toFixed(2),
+    });
+
+    await db.insert(stockMovements).values({
+      userId: req.user.id,
+      medicineId: data.medicineId,
+      movementType: 'purchased',
+      quantity: data.quantity,
+      referenceId: stockEntry.id,
+      notes: 'Added to inventory stock',
     });
 
     res.status(201).json(stockEntry);

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { stockMedicines, medicines, batches } from '../db/schema.js';
 import { requireAuth, requireRole } from '../middleware/auth.js';
@@ -41,7 +41,7 @@ router.get('/', requireAuth, async (req, res, next) => {
         const itemBatches = await db
           .select()
           .from(batches)
-          .where(eq(batches.medicineId, item.medicineId));
+          .where(and(eq(batches.medicineId, item.medicineId), eq(batches.userId, userId)));
 
         return {
           ...item,
@@ -83,14 +83,14 @@ router.get('/:medicineId', requireAuth, async (req, res, next) => {
       })
       .from(stockMedicines)
       .innerJoin(medicines, eq(stockMedicines.medicineId, medicines.id))
-      .where(eq(stockMedicines.medicineId, req.params.medicineId));
+      .where(and(eq(stockMedicines.medicineId, req.params.medicineId), eq(stockMedicines.userId, req.user.id)));
 
     if (!stockItem) return res.status(404).json({ error: 'Stock item not found' });
 
     const itemBatches = await db
       .select()
       .from(batches)
-      .where(eq(batches.medicineId, req.params.medicineId));
+      .where(and(eq(batches.medicineId, req.params.medicineId), eq(batches.userId, req.user.id)));
 
     const batchData =
       itemBatches.length > 0
