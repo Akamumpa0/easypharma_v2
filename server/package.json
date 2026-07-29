@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
-    "build": "npm ci && npm rebuild sharp",
+    "build": "npm install",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node src/db/migrate.js",
     "db:studio": "drizzle-kit studio",
