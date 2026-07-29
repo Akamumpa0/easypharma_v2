@@ -48,23 +48,7 @@ app.use(helmet({
 }));
 
 const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true); // allow server-to-server, curl, or mobile requests
-
-    const cleanOrigin = origin.trim().replace(/\/$/, '');
-    const configuredUrl = process.env.CLIENT_URL ? process.env.CLIENT_URL.trim().replace(/\/$/, '') : null;
-
-    const isLocal = cleanOrigin.startsWith('http://localhost') || cleanOrigin.startsWith('http://127.0.0.1');
-    const isRenderOrVercel = cleanOrigin.endsWith('.onrender.com') || cleanOrigin.endsWith('.vercel.app');
-    const isConfigured = configuredUrl && cleanOrigin === configuredUrl;
-
-    if (isLocal || isRenderOrVercel || isConfigured) {
-      callback(null, true);
-    } else {
-      logger.warn(`CORS check failed for origin: ${origin}`);
-      callback(null, false);
-    }
-  },
+  origin: true, // Dynamically reflect request origin (equivalent to callback(null, true))
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   // Omit allowedHeaders so cors automatically reflects Access-Control-Request-Headers during preflight
@@ -155,7 +139,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   logger.info(`EasyPharma server running on port ${PORT}`);
   logger.info(`API docs available at http://localhost:${PORT}/api/docs`);
 });
