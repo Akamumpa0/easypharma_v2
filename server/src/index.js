@@ -38,12 +38,18 @@ import systemRoutes from './routes/system.js';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust load balancers / reverse proxies (Render, Vercel, Heroku, AWS)
+app.set('trust proxy', 1);
+
 // ── Security & CORS ───────────────────────────────────────────────────────────
-app.use(helmet({ contentSecurityPolicy: false })); // disabled so Swagger UI loads
+app.use(helmet({
+  contentSecurityPolicy: false, // disabled so Swagger UI loads
+  crossOriginResourcePolicy: { policy: 'cross-origin' }, // allow cross-origin requests from frontends on distinct domains
+}));
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true); // allow server-to-server or mobile requests
+    if (!origin) return callback(null, true); // allow server-to-server, curl, or mobile requests
 
     const cleanOrigin = origin.trim().replace(/\/$/, '');
     const configuredUrl = process.env.CLIENT_URL ? process.env.CLIENT_URL.trim().replace(/\/$/, '') : null;
@@ -55,12 +61,15 @@ const corsOptions = {
     if (isLocal || isRenderOrVercel || isConfigured) {
       callback(null, true);
     } else {
-      callback(null, false);
+      logger.warn(`CORS check failed for origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  // Omit allowedHeaders so cors automatically reflects Access-Control-Request-Headers during preflight
+  exposedHeaders: ['Content-Disposition', 'Content-Length', 'X-Total-Count'],
+  maxAge: 86400, // cache preflight OPTIONS response for 24 hours
 };
 
 app.use(cors(corsOptions));
