@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
-import { Printer, X, Download } from 'lucide-react';
+import { Printer, X } from 'lucide-react';
 
 export default function LabelPrinter({ labels, onClose }) {
   const [copies, setCopies] = useState(1);
 
   const handlePrint = () => {
-    window.print();
-  };
-
-  const handleDownload = () => {
     // Create a printable HTML document
     const printWindow = window.open('', '_blank');
     const html = generatePrintHTML(labels, copies);
@@ -40,13 +36,9 @@ export default function LabelPrinter({ labels, onClose }) {
             onChange={(e) => setCopies(parseInt(e.target.value) || 1)}
             className="input w-20"
           />
-          <button onClick={handlePrint} className="btn-primary ml-auto">
+          <button onClick={handlePrint} className="btn-primary ml-auto flex items-center gap-1">
             <Printer className="w-4 h-4" />
-            Print
-          </button>
-          <button onClick={handleDownload} className="btn-secondary">
-            <Download className="w-4 h-4" />
-            Download
+            Print Labels
           </button>
         </div>
 
@@ -95,7 +87,7 @@ function LabelCard({ label }) {
       <div className="text-xs text-gray-700 space-y-1">
         <p><strong>Code:</strong> {label.medicineCode}</p>
         {label.manufacturer && <p><strong>Mfr:</strong> {label.manufacturer}</p>}
-        {label.sellingPrice && <p><strong>Price:</strong> ${label.sellingPrice}</p>}
+        {label.sellingPrice && <p><strong>Price:</strong> {new Intl.NumberFormat('en-UG', { style: 'currency', currency: 'UGX', minimumFractionDigits: 0 }).format(label.sellingPrice)}</p>}
         {label.expiryDate && (
           <p><strong>Exp:</strong> {new Date(label.expiryDate).toLocaleDateString()}</p>
         )}
@@ -117,7 +109,7 @@ function generatePrintHTML(labels, copies) {
         <div style="font-size: 10px;">
           <p style="margin: 2px 0;"><strong>Code:</strong> ${label.medicineCode}</p>
           ${label.manufacturer ? `<p style="margin: 2px 0;"><strong>Mfr:</strong> ${label.manufacturer}</p>` : ''}
-          ${label.sellingPrice ? `<p style="margin: 2px 0;"><strong>Price:</strong> $${label.sellingPrice}</p>` : ''}
+          ${label.sellingPrice ? `<p style="margin: 2px 0;"><strong>Price:</strong> ${new Intl.NumberFormat('en-UG', { style: 'currency', currency: 'UGX', minimumFractionDigits: 0 }).format(label.sellingPrice)}</p>` : ''}
           ${label.expiryDate ? `<p style="margin: 2px 0;"><strong>Exp:</strong> ${new Date(label.expiryDate).toLocaleDateString()}</p>` : ''}
         </div>
       </div>

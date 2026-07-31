@@ -57,9 +57,14 @@ export default function CustomerServicePage() {
   );
 
   const addToBill = (item) => {
+    setError('');
     setBillItems((prev) => {
       const existing = prev.find((b) => b.medicineId === item.medicineId);
       if (existing) {
+        if (existing.quantity >= item.quantity) {
+          setError(`Cannot add more than available stock (${item.quantity}) for ${item.generalName}`);
+          return prev;
+        }
         return prev.map((b) =>
           b.medicineId === item.medicineId ? { ...b, quantity: b.quantity + 1 } : b
         );
@@ -70,16 +75,27 @@ export default function CustomerServicePage() {
         unitName: item.unitName,
         unitPrice: parseFloat(item.sellingPrice),
         quantity: 1,
+        maxQty: item.quantity,
       }];
     });
   };
 
   const updateQty = (medicineId, qty) => {
+    setError('');
     if (qty <= 0) {
       setBillItems((prev) => prev.filter((b) => b.medicineId !== medicineId));
     } else {
       setBillItems((prev) =>
-        prev.map((b) => b.medicineId === medicineId ? { ...b, quantity: qty } : b)
+        prev.map((b) => {
+          if (b.medicineId === medicineId) {
+            if (b.maxQty !== undefined && qty > b.maxQty) {
+              setError(`Cannot exceed available stock (${b.maxQty}) for ${b.medicineName}`);
+              return b;
+            }
+            return { ...b, quantity: qty };
+          }
+          return b;
+        })
       );
     }
   };

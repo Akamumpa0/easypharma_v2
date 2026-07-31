@@ -9,4 +9,9 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 });
 
+// Prevent Node server crashes when Neon terminates idle database connections
+pool.on('error', (err) => {
+  console.error('Unexpected error on idle database client (Neon disconnect):', err.message);
+});
+
 export const db = drizzle(pool, { schema });

@@ -143,3 +143,12 @@ app.listen(PORT, '0.0.0.0', () => {
   logger.info(`EasyPharma server running on port ${PORT}`);
   logger.info(`API docs available at http://localhost:${PORT}/api/docs`);
 });
+
+// Graceful exception logging to avoid abrupt unhandled process terminations
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('Unhandled Rejection at:', { promise, reason });
+});
+
+process.on('uncaughtException', (err) => {
+  logger.error('Uncaught Exception thrown:', { error: err.message, stack: err.stack });
+});

@@ -34,8 +34,17 @@ export default function ActivityLogsPage() {
 
   useEffect(() => { fetchLogs(); }, [fetchLogs]);
 
-  const handleExport = () => {
-    window.open('/api/activity-logs/export', '_blank');
+  const handleExport = async () => {
+    try {
+      const res = await api.get('/activity-logs/export', { responseType: 'blob' });
+      const url = URL.createObjectURL(res.data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `activity-logs-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+    } catch (err) {
+      alert('Failed to export activity logs: ' + getErrorMessage(err));
+    }
   };
 
   const setFilter = (key, value) => setFilters(prev => ({ ...prev, [key]: value, page: 1 }));

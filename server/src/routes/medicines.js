@@ -17,7 +17,7 @@ const medicineSchema = z.object({
   description: z.string().optional(),
   unitName: z.string().min(1),
   unitType: z.enum(['tablet', 'capsule', 'bottle', 'tube', 'injection', 'vial', 'ampoule',
-    'packet', 'box', 'strip', 'carton', 'ml', 'litre', 'gram', 'kilogram']).optional(),
+    'packet', 'box', 'strip', 'carton', 'ml', 'litre', 'mg', 'gram', 'kilogram']).optional(),
   category: z.string().optional(),
   imageUrl: z.string().optional(),
   isControlled: z.boolean().optional(),

@@ -4,13 +4,14 @@ import { z } from 'zod';
 import { db } from '../db/index.js';
 import { suppliers, purchaseOrders } from '../db/schema.js';
 import { requireAuth, requireRole } from '../middleware/auth.js';
+import { normalizeUgandanPhone } from '../utils/phone.js';
 
 const router = Router();
 
 const supplierSchema = z.object({
   name: z.string().min(1, 'Name required'),
   email: z.string().email().optional().or(z.literal('')),
-  phone: z.string().optional(),
+  phone: z.string().optional().transform(val => val ? normalizeUgandanPhone(val) : ''),
   address: z.string().optional(),
   tin: z.string().optional(),
   leadTimeDays: z.coerce.number().int().min(0).optional(),

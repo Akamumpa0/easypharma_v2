@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { eq } from 'drizzle-orm';
+import { eq, asc } from 'drizzle-orm';
 import ExcelJS from 'exceljs';
 import { parse as csvParse } from 'csv-parse/sync';
 import { stringify as csvStringify } from 'csv-stringify/sync';
@@ -17,10 +17,10 @@ const router = Router();
 router.get('/medicines', requireAuth, requireRole('admin'), async (req, res, next) => {
   try {
     const format = req.query.format || 'excel';
-    const rows = await db.select().from(medicines);
+    const rows = await db.select().from(medicines).orderBy(asc(medicines.createdAt), asc(medicines.id));
 
-    const data = rows.map(m => ({
-      ID: m.id,
+    const data = rows.map((m, idx) => ({
+      ID: String(idx + 1).padStart(3, '0'),
       'General Name': m.generalName,
       'Brand Name': m.brandName || '',
       'Scientific Name': m.scientificName || '',

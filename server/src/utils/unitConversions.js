@@ -22,6 +22,7 @@ export const UNIT_TYPES = {
   LITRE: { value: 'litre', label: 'Litre (L)', category: 'volume', baseUnit: 'ml', conversionFactor: 1000 },
   
   // Weight measurements
+  MG: { value: 'mg', label: 'Milligram (mg)', category: 'weight', baseUnit: 'mg', conversionFactor: 1 },
   GRAM: { value: 'gram', label: 'Gram (g)', category: 'weight', baseUnit: 'mg', conversionFactor: 1000 },
   KILOGRAM: { value: 'kilogram', label: 'Kilogram (kg)', category: 'weight', baseUnit: 'mg', conversionFactor: 1000000 },
 };

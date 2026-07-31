@@ -9,7 +9,7 @@ export const subscriptionEnum = pgEnum('subscription_type', ['free_subscription'
 
 export const unitTypeEnum = pgEnum('unit_type', [
   'tablet', 'capsule', 'bottle', 'tube', 'injection', 'vial', 'ampoule',
-  'packet', 'box', 'strip', 'carton', 'ml', 'litre', 'gram', 'kilogram'
+  'packet', 'box', 'strip', 'carton', 'ml', 'litre', 'gram', 'kilogram', 'mg'
 ]);
 
 export const purchaseOrderStatusEnum = pgEnum('purchase_order_status', [

@@ -10,6 +10,10 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 });
 
+pool.on('error', (err) => {
+  console.warn('Notice: Idle pool client error during migration:', err.message);
+});
+
 const db = drizzle(pool);
 
 async function main() {

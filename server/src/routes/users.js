@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { db } from '../db/index.js';
 import { users } from '../db/schema.js';
 import { requireAuth, requireRole } from '../middleware/auth.js';
+import { normalizeUgandanPhone } from '../utils/phone.js';
 
 const router = Router();
 
@@ -16,7 +17,7 @@ const createUserSchema = z.object({
   role: z.enum(['admin', 'pharmacist']).default('pharmacist'),
   pharmacyName: z.string().optional(),
   address: z.string().optional(),
-  phone: z.string().optional(),
+  phone: z.string().optional().transform(val => val ? normalizeUgandanPhone(val) : ''),
 });
 
 const updateUserSchema = z.object({
@@ -24,7 +25,7 @@ const updateUserSchema = z.object({
   lastName: z.string().min(1).optional(),
   pharmacyName: z.string().optional(),
   address: z.string().optional(),
-  phone: z.string().optional(),
+  phone: z.string().optional().transform(val => val ? normalizeUgandanPhone(val) : ''),
   isActive: z.boolean().optional(),
   role: z.enum(['admin', 'pharmacist']).optional(),
 });

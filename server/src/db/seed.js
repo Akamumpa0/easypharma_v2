@@ -29,9 +29,9 @@ const SAMPLE_MEDICINES = [
 ];
 
 const SAMPLE_SUPPLIERS = [
-  { name: 'MedSupply Ltd',    email: 'orders@medsupply.com',   phone: '+1-800-555-0101', address: '123 Pharma St', leadTimeDays: 5  },
-  { name: 'Global Pharma',    email: 'supply@globalpharma.com',phone: '+1-800-555-0202', address: '456 Med Ave',   leadTimeDays: 7  },
-  { name: 'HealthFirst Inc',  email: 'orders@healthfirst.com', phone: '+1-800-555-0303', address: '789 Health Rd', leadTimeDays: 3  },
+  { name: 'MedSupply Ltd',    email: 'orders@medsupply.com',   phone: '256772555101', address: '123 Pharma St', leadTimeDays: 5  },
+  { name: 'Global Pharma',    email: 'supply@globalpharma.com',phone: '256782555202', address: '456 Med Ave',   leadTimeDays: 7  },
+  { name: 'HealthFirst Inc',  email: 'orders@healthfirst.com', phone: '256702555303', address: '789 Health Rd', leadTimeDays: 3  },
 ];
 
 const EXPENSE_TYPES = ['rent', 'electricity', 'water', 'salary', 'internet'];
@@ -52,7 +52,7 @@ async function seed() {
       firstName: 'System', lastName: 'Admin',
       role: 'admin', isActive: true,
       pharmacyName: 'EasyPharma HQ', tin: 'TIN-000001',
-      phone: '+1-800-PHARMA', address: '1 Pharma Plaza',
+      phone: '256772555001', address: '1 Pharma Plaza',
     }).returning();
     console.log('  ✓ Admin user created');
   }
@@ -71,7 +71,7 @@ async function seed() {
       firstName: 'Jane', lastName: 'Doe',
       role: 'pharmacist', isActive: true,
       pharmacyName: 'City Pharmacy', tin: 'TIN-100001',
-      phone: '+1-555-1234', address: '10 Main Street',
+      phone: '256772555002', address: '10 Main Street',
     }).returning();
     console.log('  ✓ Pharmacist user created');
   }

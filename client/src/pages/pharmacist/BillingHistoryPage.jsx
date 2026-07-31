@@ -29,8 +29,14 @@ export default function BillingHistoryPage() {
     } catch (err) { alert(getErrorMessage(err)); }
   };
 
-  const printReceipt = (billId) => {
-    window.open(`/api/receipts/${billId}/pdf`, '_blank');
+  const printReceipt = async (billId) => {
+    try {
+      const res = await api.get(`/receipts/${billId}/pdf`, { responseType: 'blob' });
+      const url = URL.createObjectURL(res.data);
+      window.open(url, '_blank');
+    } catch (err) {
+      alert('Failed to generate receipt PDF: ' + getErrorMessage(err));
+    }
   };
 
   const filtered = bills.filter(b =>

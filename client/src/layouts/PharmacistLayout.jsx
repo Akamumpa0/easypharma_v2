@@ -67,16 +67,27 @@ export default function PharmacistLayout() {
           ))}
         </nav>
 
-        <div className="flex-shrink-0 p-4 border-t border-primary-700">
-          <div className="text-xs text-primary-300 mb-1">
-            {user?.firstName} {user?.lastName}
+        <div className="flex-shrink-0 p-4 border-t border-primary-700 flex items-center gap-3">
+          <NavLink to="/pharmacist/profile" className="relative flex-shrink-0 group" onClick={() => setSidebarOpen(false)}>
+            {user?.profilePhoto ? (
+              <img src={`/uploads${user.profilePhoto}`} alt="Profile" className="w-10 h-10 rounded-full object-cover border-2 border-primary-500 shadow-sm group-hover:opacity-90 transition-opacity" />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-primary-700 flex items-center justify-center border border-primary-600 text-white font-bold text-sm shadow-sm group-hover:bg-primary-600 transition-colors">
+                {user?.firstName?.[0]}{user?.lastName?.[0]}
+              </div>
+            )}
+          </NavLink>
+          <div className="min-w-0 flex-1">
+            <NavLink to="/pharmacist/profile" onClick={() => setSidebarOpen(false)} className="text-xs font-semibold text-white hover:underline truncate block">
+              {user?.firstName} {user?.lastName}
+            </NavLink>
+            {user?.pharmacyName && (
+              <div className="text-xs text-primary-300 truncate mb-1">{user.pharmacyName}</div>
+            )}
+            <button onClick={handleLogout} className="flex items-center gap-1.5 text-xs text-primary-200 hover:text-white transition-colors mt-1">
+              <LogOut className="w-3.5 h-3.5" /> Sign Out
+            </button>
           </div>
-          {user?.pharmacyName && (
-            <div className="text-xs text-primary-400 mb-3">{user.pharmacyName}</div>
-          )}
-          <button onClick={handleLogout} className="flex items-center gap-2 text-sm text-primary-200 hover:text-white transition-colors">
-            <LogOut className="w-4 h-4" /> Sign Out
-          </button>
         </div>
       </aside>
 
@@ -85,14 +96,28 @@ export default function PharmacistLayout() {
       )}
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center gap-4">
-          <button className="lg:hidden" onClick={() => setSidebarOpen(true)}>
-            <Menu className="w-5 h-5" />
-          </button>
-          <h1 className="text-lg font-semibold text-gray-800">Pharmacist Panel</h1>
-          <button onClick={toggleTheme} className="ml-auto p-2 rounded-full hover:bg-gray-100 text-gray-500" title="Toggle theme">
-            {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-          </button>
+        <header className="bg-white border-b border-gray-200 px-6 py-3.5 flex items-center justify-between gap-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <button className="lg:hidden p-1 rounded hover:bg-gray-100 transition-colors" onClick={() => setSidebarOpen(true)}>
+              <Menu className="w-5 h-5 text-gray-600" />
+            </button>
+            <h1 className="text-lg font-bold text-gray-800 tracking-tight">Pharmacist Panel</h1>
+          </div>
+          <div className="flex items-center gap-3">
+            <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors" title="Toggle theme">
+              {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+            </button>
+            <NavLink to="/pharmacist/profile" className="flex items-center gap-2.5 p-1 rounded-full hover:bg-gray-50 border border-transparent hover:border-gray-200 transition-all">
+              {user?.profilePhoto ? (
+                <img src={`/uploads${user.profilePhoto}`} alt="Profile" className="w-8 h-8 rounded-full object-cover border border-gray-200 shadow-sm" />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-bold text-xs">
+                  {user?.firstName?.[0]}{user?.lastName?.[0]}
+                </div>
+              )}
+              <span className="text-sm font-medium text-gray-700 pr-2 hidden sm:inline">{user?.firstName} {user?.lastName}</span>
+            </NavLink>
+          </div>
         </header>
         <main className="flex-1 overflow-auto p-6">
           <Outlet />

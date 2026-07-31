@@ -6,13 +6,14 @@ import { db } from '../db/index.js';
 import { users, activityLogs } from '../db/schema.js';
 import { requireAuth } from '../middleware/auth.js';
 import { logActivity } from '../middleware/activityLogger.js';
+import { normalizeUgandanPhone } from '../utils/phone.js';
 
 const router = Router();
 
 const updateProfileSchema = z.object({
   firstName:    z.string().min(1).optional(),
   lastName:     z.string().min(1).optional(),
-  phone:        z.string().optional(),
+  phone:        z.string().optional().transform(val => val ? normalizeUgandanPhone(val) : ''),
   pharmacyName: z.string().optional(),
   address:      z.string().optional(),
   tin:          z.string().optional(),

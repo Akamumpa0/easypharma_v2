@@ -6,11 +6,19 @@ import { User, Key, Clock, Camera } from 'lucide-react';
 import api from '../../lib/api.js';
 import { getErrorMessage } from '../../lib/utils.js';
 import ImageUpload from '../../components/ImageUpload.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 
 const profileSchema = z.object({
   firstName: z.string().min(1),
   lastName: z.string().min(1),
-  phone: z.string().optional(),
+  phone: z.string().optional().or(z.literal(''))
+    .refine(val => {
+      if (!val) return true;
+      const clean = val.replace(/[^\d]/g, '');
+      return /^(?:256|0)?[1-9]\d{8}$/.test(clean);
+    }, {
+      message: 'Must be a valid Ugandan number (e.g. 07XXXXXXXX or 256XXXXXXXX)',
+    }),
   pharmacyName: z.string().optional(),
   address: z.string().optional(),
   tin: z.string().optional(),
@@ -28,6 +36,7 @@ const passwordSchema = z.object({
 });
 
 export default function ProfilePage() {
+  const { updateUser } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('profile');
@@ -56,6 +65,7 @@ export default function ProfilePage() {
     try {
       const res = await api.patch('/profile', data);
       setProfile(prev => ({ ...prev, ...res.data }));
+      updateUser(res.data);
       setProfileSuccess('Profile updated successfully');
     } catch (err) { setProfileError(getErrorMessage(err)); }
   };
@@ -147,7 +157,8 @@ export default function ProfilePage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="label">Phone</label>
-                <input className="input" {...regProfile('phone')} />
+                <input className="input" {...regProfile('phone')} placeholder="e.g. 0772123456" />
+                {profileErrors.phone && <p className="text-red-500 text-xs mt-1">{profileErrors.phone.message}</p>}
               </div>
               <div>
                 <label className="label">TIN</label>
@@ -203,8 +214,14 @@ export default function ProfilePage() {
           <ImageUpload
             currentImage={profile?.profilePhoto}
             type="profile"
-            onUpload={(data) => setProfile(prev => ({ ...prev, profilePhoto: data.profilePhoto }))}
-            onDelete={() => setProfile(prev => ({ ...prev, profilePhoto: null }))}
+            onUpload={(data) => {
+              setProfile(prev => ({ ...prev, profilePhoto: data.profilePhoto }));
+              updateUser({ profilePhoto: data.profilePhoto });
+            }}
+            onDelete={() => {
+              setProfile(prev => ({ ...prev, profilePhoto: null }));
+              updateUser({ profilePhoto: null });
+            }}
           />
         </div>
       )}

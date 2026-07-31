@@ -14,7 +14,14 @@ const userSchema = z.object({
   role: z.enum(['admin', 'pharmacist']),
   pharmacyName: z.string().optional(),
   address: z.string().optional(),
-  phone: z.string().optional(),
+  phone: z.string().optional().or(z.literal(''))
+    .refine(val => {
+      if (!val) return true;
+      const clean = val.replace(/[^\d]/g, '');
+      return /^(?:256|0)?[1-9]\d{8}$/.test(clean);
+    }, {
+      message: 'Must be a valid Ugandan number (e.g. 07XXXXXXXX or 256XXXXXXXX)',
+    }),
   isActive: z.boolean().optional(),
 });
 
@@ -102,7 +109,8 @@ function UserModal({ user, onClose, onSaved }) {
             </div>
             <div>
               <label className="label">Phone</label>
-              <input className="input" {...register('phone')} />
+              <input className="input" {...register('phone')} placeholder="e.g. 0772123456" />
+              {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
             </div>
           </div>
 

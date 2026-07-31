@@ -8,7 +8,7 @@ import { formatCurrency, getErrorMessage } from '../../lib/utils.js';
 
 const stockSchema = z.object({
   medicineId: z.string().uuid('Select a medicine'),
-  quantity: z.coerce.number().int().positive('Must be at least 1'),
+  quantity: z.coerce.number().int().min(0, 'Cannot be negative'),
   sellingPrice: z.string().min(1, 'Required'),
   buyingPrice: z.string().optional(),
   expiryDate: z.string().optional(),

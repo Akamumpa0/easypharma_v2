@@ -135,7 +135,7 @@ function DailyChart({ data }) {
         <BarChart data={chartData} margin={{ left: 10, right: 10 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
           <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-          <YAxis tick={{ fontSize: 11 }} tickFormatter={v => `$${v}`} />
+          <YAxis tick={{ fontSize: 11 }} tickFormatter={v => `UGX ${v.toLocaleString()}`} />
           <Tooltip formatter={(v) => formatCurrency(v)} />
           <Legend />
           <Bar dataKey="Revenue" fill="#16a34a" radius={[3,3,0,0]} />

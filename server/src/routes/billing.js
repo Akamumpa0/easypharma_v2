@@ -48,6 +48,20 @@ router.post('/', requireAuth, requireRole('pharmacist'), async (req, res, next) 
   try {
     const data = createBillSchema.parse(req.body);
 
+    // Verify sufficient stock exists for all items
+    for (const item of data.items) {
+      const [stockItem] = await db.select().from(stockMedicines)
+        .where(and(
+          eq(stockMedicines.medicineId, item.medicineId),
+          eq(stockMedicines.userId, req.user.id)
+        ));
+      if (!stockItem || stockItem.quantity < item.quantity) {
+        return res.status(400).json({
+          error: `Insufficient stock for "${item.medicineName}". Available: ${stockItem ? stockItem.quantity : 0}, Requested: ${item.quantity}`
+        });
+      }
+    }
+
     // Calculate total
     const total = data.items.reduce((sum, item) => {
       return sum + parseFloat(item.unitPrice) * item.quantity;

@@ -9,7 +9,14 @@ import { getErrorMessage } from '../../lib/utils.js';
 const schema = z.object({
   name: z.string().min(1, 'Required'),
   email: z.string().email().optional().or(z.literal('')),
-  phone: z.string().optional(),
+  phone: z.string().optional().or(z.literal(''))
+    .refine(val => {
+      if (!val) return true;
+      const clean = val.replace(/[^\d]/g, '');
+      return /^(?:256|0)?[1-9]\d{8}$/.test(clean);
+    }, {
+      message: 'Invalid Ugandan phone format',
+    }),
   address: z.string().optional(),
   tin: z.string().optional(),
   leadTimeDays: z.coerce.number().int().min(0).optional(),
@@ -46,7 +53,11 @@ function SupplierModal({ supplier, onClose, onSaved }) {
             {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}</div>
           <div className="grid grid-cols-2 gap-4">
             <div><label className="label">Email</label><input type="email" className="input" {...register('email')} /></div>
-            <div><label className="label">Phone</label><input className="input" {...register('phone')} /></div>
+            <div>
+              <label className="label">Phone</label>
+              <input className="input" {...register('phone')} placeholder="e.g. 0772123456" />
+              {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
+            </div>
           </div>
           <div><label className="label">Address</label><input className="input" {...register('address')} /></div>
           <div className="grid grid-cols-2 gap-4">

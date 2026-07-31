@@ -136,6 +136,7 @@ function MedicineModal({ medicine, onClose, onSaved }) {
                 <option value="carton">Carton</option>
                 <option value="ml">Millilitre</option>
                 <option value="litre">Litre</option>
+                <option value="mg">Milligram (mg)</option>
                 <option value="gram">Gram</option>
                 <option value="kilogram">Kilogram</option>
               </select>
