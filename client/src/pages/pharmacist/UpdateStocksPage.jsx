@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Plus, Pencil, X, Package } from 'lucide-react';
 import api from '../../lib/api.js';
-import { formatCurrency, getErrorMessage } from '../../lib/utils.js';
+import { formatCurrency, getErrorMessage, getUploadUrl } from '../../lib/utils.js';
 
 const stockSchema = z.object({
   medicineId: z.string().uuid('Select a medicine'),
@@ -171,7 +171,7 @@ export default function UpdateStocksPage() {
                   <td className="px-4 py-3">
                     {item.imageUrl ? (
                       <img
-                        src={`/uploads${item.imageUrl}`}
+                        src={getUploadUrl(item.imageUrl)}
                         alt={item.generalName}
                         className="w-10 h-10 rounded object-cover"
                       />

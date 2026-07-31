@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
+import { getUploadUrl } from '../lib/utils.js';
 
 const navItems = [
   { to: '/pharmacist/customer-service',   icon: ShoppingCart, label: 'Customer Service'    },
@@ -70,7 +71,7 @@ export default function PharmacistLayout() {
         <div className="flex-shrink-0 p-4 border-t border-primary-700 flex items-center gap-3">
           <NavLink to="/pharmacist/profile" className="relative flex-shrink-0 group" onClick={() => setSidebarOpen(false)}>
             {user?.profilePhoto ? (
-              <img src={`/uploads${user.profilePhoto}`} alt="Profile" className="w-10 h-10 rounded-full object-cover border-2 border-primary-500 shadow-sm group-hover:opacity-90 transition-opacity" />
+              <img src={getUploadUrl(user.profilePhoto)} alt="Profile" className="w-10 h-10 rounded-full object-cover border-2 border-primary-500 shadow-sm group-hover:opacity-90 transition-opacity" />
             ) : (
               <div className="w-10 h-10 rounded-full bg-primary-700 flex items-center justify-center border border-primary-600 text-white font-bold text-sm shadow-sm group-hover:bg-primary-600 transition-colors">
                 {user?.firstName?.[0]}{user?.lastName?.[0]}
@@ -109,7 +110,7 @@ export default function PharmacistLayout() {
             </button>
             <NavLink to="/pharmacist/profile" className="flex items-center gap-2.5 p-1 rounded-full hover:bg-gray-50 border border-transparent hover:border-gray-200 transition-all">
               {user?.profilePhoto ? (
-                <img src={`/uploads${user.profilePhoto}`} alt="Profile" className="w-8 h-8 rounded-full object-cover border border-gray-200 shadow-sm" />
+                <img src={getUploadUrl(user.profilePhoto)} alt="Profile" className="w-8 h-8 rounded-full object-cover border border-gray-200 shadow-sm" />
               ) : (
                 <div className="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-bold text-xs">
                   {user?.firstName?.[0]}{user?.lastName?.[0]}

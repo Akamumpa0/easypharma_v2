@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Search, Plus, Minus, Trash2, Receipt, ShoppingCart } from 'lucide-react';
 import api from '../../lib/api.js';
-import { formatCurrency, getErrorMessage } from '../../lib/utils.js';
+import { formatCurrency, getErrorMessage, getUploadUrl } from '../../lib/utils.js';
 
 function BillItem({ item, onUpdate, onRemove }) {
   return (
@@ -170,7 +170,7 @@ export default function CustomerServicePage() {
                 {/* Medicine thumbnail */}
                 {item.imageUrl ? (
                   <img
-                    src={`/uploads${item.imageUrl}`}
+                    src={getUploadUrl(item.imageUrl)}
                     alt={item.generalName}
                     className="w-10 h-10 rounded object-cover flex-shrink-0 mr-2"
                   />

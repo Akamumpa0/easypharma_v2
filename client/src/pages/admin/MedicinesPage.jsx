@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Plus, Pencil, Trash2, X, Barcode, Printer, QrCode, Scan, ArrowLeftRight } from 'lucide-react';
 import api from '../../lib/api.js';
-import { getErrorMessage } from '../../lib/utils.js';
+import { getErrorMessage, getUploadUrl } from '../../lib/utils.js';
 import BarcodeScanner from '../../components/BarcodeScanner.jsx';
 import LabelPrinter from '../../components/LabelPrinter.jsx';
 import ImageUpload from '../../components/ImageUpload.jsx';
@@ -338,7 +338,7 @@ export default function MedicinesPage() {
                   <td className="px-4 py-3">
                     {m.imageUrl ? (
                       <img 
-                        src={`/uploads${m.imageUrl}`} 
+                        src={getUploadUrl(m.imageUrl)} 
                         alt={m.generalName}
                         className="w-12 h-12 object-cover rounded"
                       />

@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { User, Key, Clock, Camera } from 'lucide-react';
 import api from '../../lib/api.js';
-import { getErrorMessage } from '../../lib/utils.js';
+import { getErrorMessage, getUploadUrl } from '../../lib/utils.js';
 import ImageUpload from '../../components/ImageUpload.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 
@@ -92,7 +92,7 @@ export default function ProfilePage() {
       <div className="card p-6 mb-6 flex items-center gap-6">
         <div className="relative">
           {profile?.profilePhoto ? (
-            <img src={`/uploads${profile.profilePhoto}`} alt="Profile"
+            <img src={getUploadUrl(profile.profilePhoto)} alt="Profile"
               className="w-20 h-20 rounded-full object-cover border-2 border-gray-200" />
           ) : (
             <div className="w-20 h-20 rounded-full bg-primary-100 flex items-center justify-center">

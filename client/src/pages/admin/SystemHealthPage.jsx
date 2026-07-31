@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Server, Database, HardDrive, Users, Download, RefreshCw, Plus, CheckCircle, XCircle } from 'lucide-react';
 import api from '../../lib/api.js';
-import { getErrorMessage, formatDate } from '../../lib/utils.js';
+import { getErrorMessage, formatDate, getUploadUrl } from '../../lib/utils.js';
 
 function StatusBadge({ status }) {
   return status === 'ok' || status === 'operational'
@@ -122,7 +122,7 @@ export default function SystemHealthPage() {
                   </td>
                   <td className="px-4 py-3 text-gray-500">{new Date(b.createdAt).toLocaleString()}</td>
                   <td className="px-4 py-3">
-                    <a href={`/uploads/backups/${b.filename}`} download className="btn-secondary py-1 px-2 text-xs">
+                    <a href={getUploadUrl(`/backups/${b.filename}`)} download className="btn-secondary py-1 px-2 text-xs">
                       <Download className="w-3 h-3" />Download
                     </a>
                   </td>

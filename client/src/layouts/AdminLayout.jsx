@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
+import { getUploadUrl } from '../lib/utils.js';
 
 const navItems = [
   { to: '/admin/users',          icon: Users,     label: 'User Management'  },
@@ -71,10 +72,16 @@ export default function AdminLayout() {
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-primary-700">
-          <NavLink to="/admin/profile" className="flex items-center gap-2 text-sm text-primary-200 hover:text-white transition-colors mb-3">
-            <User className="w-4 h-4" />
-            <div>
-              <div>{user?.firstName} {user?.lastName}</div>
+          <NavLink to="/admin/profile" className="flex items-center gap-3 text-sm text-primary-200 hover:text-white transition-colors mb-3">
+            {user?.profilePhoto ? (
+              <img src={getUploadUrl(user.profilePhoto)} alt="Profile" className="w-9 h-9 rounded-full object-cover border-2 border-primary-500 shadow-sm flex-shrink-0" />
+            ) : (
+              <div className="w-9 h-9 rounded-full bg-primary-700 flex items-center justify-center border border-primary-600 text-white font-bold text-sm shadow-sm flex-shrink-0">
+                {user?.firstName?.[0]}{user?.lastName?.[0]}
+              </div>
+            )}
+            <div className="min-w-0 flex-1 truncate">
+              <div className="font-semibold text-white truncate">{user?.firstName} {user?.lastName}</div>
               <div className="text-xs text-primary-400">Admin</div>
             </div>
           </NavLink>
@@ -102,9 +109,21 @@ export default function AdminLayout() {
             <Menu className="w-5 h-5" />
           </button>
           <h1 className="text-lg font-semibold text-gray-800">Admin Panel</h1>
-          <button onClick={toggleTheme} className="ml-auto p-2 rounded-full hover:bg-gray-100 text-gray-500" title="Toggle theme">
-            {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-          </button>
+          <div className="ml-auto flex items-center gap-3">
+            <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors" title="Toggle theme">
+              {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+            </button>
+            <NavLink to="/admin/profile" className="flex items-center gap-2.5 p-1 rounded-full hover:bg-gray-50 border border-transparent hover:border-gray-200 transition-all">
+              {user?.profilePhoto ? (
+                <img src={getUploadUrl(user.profilePhoto)} alt="Profile" className="w-8 h-8 rounded-full object-cover border border-gray-200 shadow-sm" />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-bold text-xs">
+                  {user?.firstName?.[0]}{user?.lastName?.[0]}
+                </div>
+              )}
+              <span className="text-sm font-medium text-gray-700 pr-2 hidden sm:inline">{user?.firstName} {user?.lastName}</span>
+            </NavLink>
+          </div>
         </header>
         <main id="main-content" role="main" className="flex-1 overflow-auto p-6" aria-label="Admin main content">
           <Outlet />

@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Upload, Trash2, Image as ImageIcon } from 'lucide-react';
 import api from '../lib/api.js';
-import { getErrorMessage } from '../lib/utils.js';
+import { getErrorMessage, getUploadUrl } from '../lib/utils.js';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 const MAX_SIZE_MB = 5;
@@ -11,10 +11,7 @@ const MAX_SIZE_MB = 5;
  * Handles both absolute data-URLs (from instant preview) and relative storage paths.
  */
 function resolveImageSrc(src) {
-  if (!src) return null;
-  if (src.startsWith('data:') || src.startsWith('http')) return src;
-  // Stored paths start with /medicines/, /profiles/, /receipts/
-  return `/uploads${src}`;
+  return getUploadUrl(src);
 }
 
 /**
